@@ -28,11 +28,18 @@ describe User do
 
     it { should be_admin }
   end
-
-
+  
   before do
     @user = User.new(name: "Example User", email: "user@example.com",
                      password: "foobar", password_confirmation: "foobar")
+  end
+  
+  describe "accessible attributes" do
+    it "should not allow access to admin" do
+      expect do
+        User.new(admin: "t")
+      end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+    end    
   end
 
   describe "when password is not present" do

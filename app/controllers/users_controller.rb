@@ -7,21 +7,33 @@ class UsersController < ApplicationController
   end
 
   def index
-      @users = User.paginate(page: params[:page])
+    @users = User.paginate(page: params[:page])
   end
 
   def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User destroyed."
-    redirect_to users_url
+    @user = User.find(params[:id])
+    if current_user?(@user)
+      redirect_to users_path, notice: "You can't destroy yourself."
+    else
+      @user.destroy
+      flash[:success] = "User destroyed."
+      redirect_to users_path
+    end
   end
 
-
   def new
+    if signed_in?
+      flash[:success] = "Already signed in"
+      redirect_to root_path
+    end
     @user = User.new
   end
 
   def create
+    if signed_in?
+      flash[:success] = "Already signed in"
+      redirect_to root_path
+    end
     @user = User.new(params[:user])
     if @user.save
       sign_in @user
@@ -59,9 +71,8 @@ class UsersController < ApplicationController
     redirect_to(root_path) unless current_user?(@user)
   end
 
-    def admin_user
-      redirect_to(root_path) unless current_user.admin?
-    end
-
+  def admin_user
+    redirect_to(root_path) unless current_user.admin?
+  end
 
 end
