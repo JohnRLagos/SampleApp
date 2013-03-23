@@ -28,7 +28,7 @@ describe User do
 
     it { should be_admin }
   end
-  
+
   before do
     @user = User.new(name: "Example User", email: "user@example.com",
                      password: "foobar", password_confirmation: "foobar")
@@ -58,6 +58,9 @@ describe User do
   end
 
   subject { @user }
+
+  it { should respond_to(:authenticate) }
+  it { should respond_to(:microposts) }
 
   describe "with a password that's too short" do
     before { @user.password = @user.password_confirmation = "a" * 5 }
@@ -156,7 +159,7 @@ describe User do
     describe "micropost associations" do
 
     before { @user.save }
-    let!(:older_micropost) do 
+    let!(:older_micropost) do
       FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
     end
     let!(:newer_micropost) do
